@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Urban Store · Loja Virtual</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="top">
+    <div class="wrap bar">
+      <div class="logo">Urban <b>Store</b></div>
+      <div class="actions">
+        <button class="link-btn" id="ordersBtn" hidden>Meus pedidos</button>
+        <span class="hello" id="hello" hidden></span>
+        <button class="link-btn" id="loginBtn">Entrar</button>
+        <button class="link-btn" id="logoutBtn" hidden>Sair</button>
+        <button class="cart-toggle" id="cartBtn">🛒 <span id="cartCount">0</span></button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="hero">
+      <h1>Nossa loja</h1>
+      <p>Escolha seus produtos, crie sua conta e finalize com segurança.</p>
+    </section>
+    <div class="filters" id="filters"></div>
+    <div class="grid" id="grid"></div>
+  </main>
+
+  <!-- Carrinho -->
+  <div class="overlay" id="cartOverlay" hidden></div>
+  <aside class="drawer" id="cart" hidden aria-label="Carrinho">
+    <div class="drawer-head">
+      <h2>Seu carrinho</h2>
+      <button class="close" id="cartClose" aria-label="Fechar">✕</button>
+    </div>
+    <div class="drawer-body" id="cartItems"></div>
+    <div class="drawer-foot">
+      <div class="total-row"><span>Total</span><strong id="cartTotal">R$ 0,00</strong></div>
+      <button class="btn primary block" id="checkoutBtn">Pagar e finalizar</button>
+      <p class="secure-note">🔒 Pagamento processado no servidor. Seus dados ficam protegidos.</p>
+    </div>
+  </aside>
+
+  <!-- Login / Cadastro -->
+  <div class="overlay center" id="authOverlay" hidden>
+    <div class="modal" role="dialog" aria-modal="true">
+      <button class="close abs" id="authClose" aria-label="Fechar">✕</button>
+      <div class="tabs">
+        <button class="tab active" id="tabLogin">Entrar</button>
+        <button class="tab" id="tabRegister">Criar conta</button>
+      </div>
+      <form id="authForm" class="form">
+        <div class="field" id="nameField" hidden>
+          <label for="f-name">Nome</label>
+          <input id="f-name" type="text" autocomplete="name" placeholder="Seu nome" />
+        </div>
+        <div class="field">
+          <label for="f-email">E-mail</label>
+          <input id="f-email" type="email" autocomplete="email" placeholder="voce@email.com" required />
+        </div>
+        <div class="field">
+          <label for="f-password">Senha</label>
+          <input id="f-password" type="password" autocomplete="current-password" placeholder="Mínimo 8 caracteres" required />
+        </div>
+        <p class="form-error" id="authError" hidden></p>
+        <button class="btn primary block" type="submit" id="authSubmit">Entrar</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Meus pedidos -->
+  <div class="overlay center" id="ordersOverlay" hidden>
+    <div class="modal wide" role="dialog" aria-modal="true">
+      <button class="close abs" id="ordersClose" aria-label="Fechar">✕</button>
+      <h2>Meus pedidos</h2>
+      <div id="ordersList" class="orders-list"></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" hidden></div>
+
+  <script src="app.js"></script>
+</body>
+</html>

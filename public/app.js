@@ -9,6 +9,7 @@ let PRODUCTS = [];
 let PRODUCTS_BY_ID = {};
 let authMode = 'login';
 let pendingCheckout = false;
+let STRIPE_ENABLED = false;
 
 // ---------- Utilidades ----------
 const $ = (id) => document.getElementById(id);
@@ -223,6 +224,13 @@ async function checkout() {
   btn.textContent = 'Processando...';
   try {
     const items = entries.map((e) => ({ productId: e.product.id, quantity: e.qty }));
+    if (STRIPE_ENABLED) {
+      // Paga no Stripe: cria a sessão e redireciona. O pedido só é criado
+      // depois que o Stripe confirmar o pagamento (ver /api/checkout/confirm).
+      const { url } = await api('/api/checkout', { method: 'POST', body: JSON.stringify({ items }) });
+      window.location.href = url;
+      return;
+    }
     const { order } = await api('/api/orders', { method: 'POST', body: JSON.stringify({ items }) });
     CART = {}; persistCart(); updateCartCount(); renderCart();
     $('cart').hidden = true; $('cartOverlay').hidden = true;
@@ -294,6 +302,28 @@ document.addEventListener('keydown', (e) => {
 });
 
 // ---------- Início ----------
+async function loadConfig() {
+  try { STRIPE_ENABLED = (await api('/api/config')).stripeEnabled; } catch { STRIPE_ENABLED = false; }
+}
+
+// Trata o retorno do Stripe (?pagamento=ok|cancelado|falhou|erro).
+function handleReturn() {
+  const status = new URLSearchParams(location.search).get('pagamento');
+  if (!status) return;
+  if (status === 'ok') {
+    CART = {}; persistCart(); updateCartCount();
+    toast('✅ Pagamento aprovado! Pedido confirmado.');
+    if (TOKEN) openOrders();
+  } else if (status === 'cancelado') {
+    toast('Pagamento cancelado.', true);
+  } else {
+    toast('Não foi possível confirmar o pagamento.', true);
+  }
+  history.replaceState({}, '', location.pathname);
+}
+
 updateAuthUI();
 updateCartCount();
+loadConfig();
+handleReturn();
 loadProducts().catch((err) => toast(err.message, true));

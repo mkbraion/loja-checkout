@@ -1,0 +1,16 @@
+# Blueprint de deploy no Render (https://render.com) — plano gratuito, sem cartão.
+# Ao conectar este repositório, o Render lê este arquivo e configura tudo sozinho.
+services:
+  - type: web
+    name: loja-checkout
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm run start:prod
+    envVars:
+      - key: JWT_SECRET
+        generateValue: true   # o Render gera um segredo forte automaticamente
+      - key: DATABASE_URL
+        value: file:./dev.db
+      - key: NODE_VERSION
+        value: "20"

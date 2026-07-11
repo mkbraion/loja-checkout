@@ -49,9 +49,17 @@ O checkout já separa a etapa de pagamento na função `processPayment()` em [`s
 
 > Enquanto estiver em modo teste, use os cartões de teste do Stripe (ex.: `4242 4242 4242 4242`).
 
-## Deploy
+## Deploy (grátis, 1 clique)
 
-Por ter servidor, **não roda no GitHub Pages**. Suba em um host de Node — [Render](https://render.com), [Railway](https://railway.app) ou [Fly.io](https://fly.io) têm plano gratuito. Em produção, troque o SQLite por **Postgres** (só mudar o `datasource` no `schema.prisma` e a `DATABASE_URL`).
+Por ter servidor, **não roda no GitHub Pages** — precisa de um host de Node. O repositório já vem com um [`render.yaml`](render.yaml), então dá pra subir no [Render](https://render.com) (plano gratuito, sem cartão) em poucos cliques:
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/mkbraion/loja-checkout)
+
+1. Clique no botão acima e entre no Render com sua conta do GitHub.
+2. O Render lê o `render.yaml`, gera o `JWT_SECRET` sozinho e clica em **Apply**.
+3. Em 2–3 minutos sai uma URL tipo `https://loja-checkout.onrender.com`.
+
+> No plano gratuito o serviço "dorme" após um tempo parado (a primeira visita depois disso demora ~50s) e o banco SQLite é reiniciado. Perfeito para demonstração. Para dados permanentes, troque para **Postgres** (o `render.yaml` pode provisionar um) e ajuste o `provider` no `schema.prisma`.
 
 ---
 

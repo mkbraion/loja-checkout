@@ -39,15 +39,19 @@ npm run setup                 # cria o banco e popula os produtos
 npm start                     # http://localhost:4000
 ```
 
-## Pagamento real (Stripe)
+## Pagamento real (Stripe) — já integrado
 
-O checkout já separa a etapa de pagamento na função `processPayment()` em [`src/routes/orders.js`](src/routes/orders.js), hoje simulada como aprovada. Para cobrar de verdade:
+O checkout com **Stripe Checkout** já está implementado em [`src/routes/checkout.js`](src/routes/checkout.js). Por padrão fica **desligado** (o demo usa um pagamento simulado); é só adicionar a chave para ativar:
 
-1. Crie uma conta no [Stripe](https://stripe.com) e pegue as chaves de **teste**.
-2. `npm install stripe` e use a chave secreta a partir do `.env` (`STRIPE_SECRET_KEY`).
-3. Em `processPayment()`, crie um **PaymentIntent** e confirme o pagamento com o token do cartão vindo do front (Stripe Elements). Só marque o pedido como `pago` quando o Stripe confirmar.
+1. Crie uma conta no [Stripe](https://stripe.com) e pegue a **chave secreta de teste** (`sk_test_...`).
+2. Defina a variável de ambiente `STRIPE_SECRET_KEY=sk_test_...` (no `.env` local ou nas variáveis do Render).
+3. Pronto. Com a chave presente, a loja passa a redirecionar para o Checkout do Stripe e o pedido só é criado após o pagamento confirmado.
 
-> Enquanto estiver em modo teste, use os cartões de teste do Stripe (ex.: `4242 4242 4242 4242`).
+Segurança dessa etapa:
+- Os valores das `line_items` vêm do **banco**, não do carrinho do cliente.
+- O pedido é criado apenas quando o Stripe confirma `payment_status = paid`, com **idempotência** pelo id da sessão (`paymentId`).
+- Cartões de teste do Stripe: `4242 4242 4242 4242`, validade futura, CVC qualquer.
+- Em produção, confirme também por **webhook** (`checkout.session.completed`) além do retorno.
 
 ## Deploy (grátis, 1 clique)
 

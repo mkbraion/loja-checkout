@@ -8,6 +8,7 @@ const rateLimit = require('express-rate-limit');
 const authRoutes = require('./routes/auth');
 const productRoutes = require('./routes/products');
 const orderRoutes = require('./routes/orders');
+const checkoutRoutes = require('./routes/checkout');
 
 // Sem segredo do JWT o app não sobe — evita rodar inseguro por engano.
 if (!process.env.JWT_SECRET || process.env.JWT_SECRET.length < 16) {
@@ -16,6 +17,9 @@ if (!process.env.JWT_SECRET || process.env.JWT_SECRET.length < 16) {
 }
 
 const app = express();
+
+// Atrás do proxy do Render — para pegar o IP real (rate-limit) e o https.
+app.set('trust proxy', 1);
 
 // Cabeçalhos de segurança (CSP, no-sniff, etc.). A CSP padrão do Helmet
 // permite apenas recursos da própria origem — por isso o front usa
@@ -36,7 +40,11 @@ const authLimiter = rateLimit({
 app.use('/api/auth', authLimiter, authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
+app.use('/api/checkout', checkoutRoutes);
 app.get('/api/health', (req, res) => res.json({ ok: true }));
+
+// Diz ao frontend se o pagamento com cartão (Stripe) está ativo.
+app.get('/api/config', (req, res) => res.json({ stripeEnabled: !!process.env.STRIPE_SECRET_KEY }));
 
 // Frontend (arquivos estáticos).
 app.use(express.static(path.join(__dirname, '..', 'public')));

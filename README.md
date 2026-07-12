@@ -59,7 +59,9 @@ Por ter servidor, **não roda no GitHub Pages** — precisa de um host de Node. 
 2. O Render lê o `render.yaml`, gera o `JWT_SECRET` sozinho e clica em **Apply**.
 3. Em 2–3 minutos sai uma URL tipo `https://loja-checkout.onrender.com`.
 
-> No plano gratuito o serviço "dorme" após um tempo parado (a primeira visita depois disso demora ~50s) e o banco SQLite é reiniciado. Perfeito para demonstração. Para dados permanentes, troque para **Postgres** (o `render.yaml` pode provisionar um) e ajuste o `provider` no `schema.prisma`.
+O `render.yaml` já provisiona um **PostgreSQL gratuito** e injeta a `DATABASE_URL` sozinho — ou seja, **os dados (contas e pedidos) ficam salvos** entre reinícios.
+
+> No plano gratuito o serviço "dorme" após um tempo parado (a 1ª visita depois demora ~50s pra acordar) e o Postgres gratuito do Render expira em 30 dias. Para algo definitivo, use um Postgres sem expiração (Neon/Supabase têm plano gratuito) na `DATABASE_URL`.
 
 ---
 

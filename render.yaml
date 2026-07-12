@@ -1,5 +1,11 @@
 # Blueprint de deploy no Render (https://render.com) — plano gratuito, sem cartão.
-# Ao conectar este repositório, o Render lê este arquivo e configura tudo sozinho.
+# Provisiona um Postgres gratuito e sobe a loja, tudo automático.
+databases:
+  - name: loja-db
+    plan: free
+    databaseName: loja
+    user: loja
+
 services:
   - type: web
     name: loja-checkout
@@ -9,8 +15,10 @@ services:
     startCommand: npm run start:prod
     envVars:
       - key: JWT_SECRET
-        generateValue: true   # o Render gera um segredo forte automaticamente
+        generateValue: true            # o Render gera um segredo forte sozinho
       - key: DATABASE_URL
-        value: file:./dev.db
+        fromDatabase:
+          name: loja-db
+          property: connectionString   # conecta na base Postgres acima
       - key: NODE_VERSION
         value: "20"

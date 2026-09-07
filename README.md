@@ -1,8 +1,8 @@
 # Loja Virtual · login seguro e checkout
 
-Loja virtual completa (full-stack) com **cadastro/login seguro** e **checkout**. Diferente dos sites institucionais, este é um app de verdade: tem servidor, banco de dados e autenticação.
+Aplicação full-stack de loja virtual com cadastro, autenticação, catálogo, pedidos e checkout. O backend calcula os valores dos pedidos a partir dos preços do banco.
 
-Stack: **Node + Express + Prisma (SQLite) + JWT**. Frontend em HTML/CSS/JS puro.
+Stack: **Node + Express + Prisma + PostgreSQL + JWT**. Frontend em HTML/CSS/JS puro.
 
 ## O que tem
 
@@ -35,7 +35,8 @@ npm install
 cp .env.example .env          # no Windows: copy .env.example .env
 # edite o .env e gere um JWT_SECRET forte:
 #   node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"
-npm run setup                 # cria o banco e popula os produtos
+# configure DATABASE_URL para uma instância PostgreSQL disponível
+npm run setup                 # aplica o schema e popula os produtos
 npm start                     # http://localhost:4000
 ```
 

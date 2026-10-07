@@ -1,5 +1,7 @@
 # Loja Virtual · login seguro e checkout
 
+**No ar:** https://loja-checkout.onrender.com
+
 Loja virtual completa (full-stack) com **cadastro/login seguro** e **checkout**. Diferente dos sites institucionais, este é um app de verdade: tem servidor, banco de dados e autenticação.
 
 Stack: **Node + Express + Prisma (SQLite) + JWT**. Frontend em HTML/CSS/JS puro.

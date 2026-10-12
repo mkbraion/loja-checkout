@@ -1,5 +1,7 @@
 # Loja Virtual · login seguro e checkout
 
+**No ar:** https://loja-checkout.onrender.com
+
 Aplicação full-stack de loja virtual com cadastro, autenticação, catálogo, pedidos e checkout. O backend calcula os valores dos pedidos a partir dos preços do banco.
 
 Stack: **Node + Express + Prisma + PostgreSQL + JWT**. Frontend em HTML/CSS/JS puro.

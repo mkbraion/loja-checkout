@@ -12,7 +12,8 @@
     "start": "node src/server.js",
     "start:prod": "prisma db push --skip-generate && node src/seed.js && node src/server.js",
     "dev": "node --watch src/server.js",
-    "seed": "node src/seed.js"
+    "seed": "node src/seed.js",
+    "test": "node --test"
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",

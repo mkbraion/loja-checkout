@@ -2,6 +2,7 @@ const express = require('express');
 const prisma = require('../prisma');
 const { authRequired } = require('../middleware/auth');
 const { normalizeCart } = require('../cart');
+const { recordPaidCheckout } = require('../paid-checkout');
 
 const router = express.Router();
 
@@ -70,27 +71,7 @@ router.get('/confirm', async (req, res) => {
     const session = await stripe.checkout.sessions.retrieve(String(req.query.session_id || ''));
     if (!session || session.payment_status !== 'paid') return res.redirect('/?pagamento=falhou');
 
-    // idempotência: não recria se já registramos este pagamento.
-    const existing = await prisma.order.findFirst({ where: { paymentId: session.id } });
-    if (existing) return res.redirect('/?pagamento=ok');
-
-    const items = JSON.parse(session.metadata.items || '[]').map((i) => ({ productId: i.id, quantity: i.qty }));
-    const cart = await priceCart(items);
-    if (!cart) return res.redirect('/?pagamento=erro');
-
-    await prisma.order.create({
-      data: {
-        userId: session.metadata.userId,
-        total: cart.total,
-        status: 'pago',
-        paymentId: session.id,
-        items: {
-          create: cart.lines.map(({ product, qty }) => ({
-            productId: product.id, name: product.name, price: product.price, quantity: qty,
-          })),
-        },
-      },
-    });
+    await recordPaidCheckout(session);
     res.redirect('/?pagamento=ok');
   } catch (e) {
     res.redirect('/?pagamento=erro');

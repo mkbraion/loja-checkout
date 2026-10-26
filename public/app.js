@@ -234,13 +234,13 @@ async function checkout() {
     const { order } = await api('/api/orders', { method: 'POST', body: JSON.stringify({ items }) });
     CART = {}; persistCart(); updateCartCount(); renderCart();
     $('cart').hidden = true; $('cartOverlay').hidden = true;
-    toast('✅ Pedido confirmado! Total ' + brl(order.total));
+    toast('Pedido de demonstração criado (sem cobrança). Total ' + brl(order.total));
     openOrders();
   } catch (err) {
     toast(err.message, true);
   } finally {
     btn.disabled = false;
-    btn.textContent = 'Pagar e finalizar';
+    btn.textContent = STRIPE_ENABLED ? 'Pagar e finalizar' : 'Criar pedido de demonstração';
   }
 }
 
@@ -258,7 +258,7 @@ async function openOrders() {
       const card = el('div', { class: 'order' },
         el('div', { class: 'order-head' },
           el('span', { text: new Date(o.createdAt).toLocaleString('pt-BR') }),
-          el('span', { class: 'paid', text: o.status.toUpperCase() }),
+          el('span', { class: 'paid', text: o.status === 'simulado' ? 'DEMONSTRAÇÃO · SEM PAGAMENTO' : o.status.toUpperCase() }),
         ),
       );
       o.items.forEach((it) => {
@@ -304,6 +304,7 @@ document.addEventListener('keydown', (e) => {
 // ---------- Início ----------
 async function loadConfig() {
   try { STRIPE_ENABLED = (await api('/api/config')).stripeEnabled; } catch { STRIPE_ENABLED = false; }
+  $('checkoutBtn').textContent = STRIPE_ENABLED ? 'Pagar e finalizar' : 'Criar pedido de demonstração';
 }
 
 // Trata o retorno do Stripe (?pagamento=ok|cancelado|falhou|erro).

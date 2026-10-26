@@ -24,7 +24,7 @@
     "express-rate-limit": "^8.6.2",
     "helmet": "^8.0.0",
     "jsonwebtoken": "^9.0.2",
-    "prisma": "^5.22.0",
+    "prisma": "^7.10.1",
     "stripe": "^17.4.0"
   }
 }

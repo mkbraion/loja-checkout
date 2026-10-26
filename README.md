@@ -74,7 +74,8 @@ Segurança dessa etapa:
 - O pedido é criado apenas quando o Stripe confirma `payment_status = paid`, com **idempotência** pelo id da sessão (`paymentId`).
 - Cartões de teste do Stripe: `4242 4242 4242 4242`, validade futura, CVC qualquer.
 - O webhook valida a assinatura com `STRIPE_WEBHOOK_SECRET` e registra o pedido mesmo sem retorno do navegador. O retorno também confirma a sessão pela API do Stripe. Ambos utilizam a mesma rotina de registro, protegida pelo índice único `paymentId`.
-- **Limitação atual:** o registro compara o valor pago com os preços atuais do banco. Se os preços mudarem entre a criação da sessão e a confirmação, o registro falhará e exigirá conciliação manual. Não use em produção sem implementar um snapshot persistente do pedido.
+- O registro consulta os itens e preços efetivamente cobrados na sessão Stripe, para não depender de alterações posteriores nos preços do catálogo. Ainda é necessário validar esse fluxo com pagamentos reais em **modo de teste** antes de uso em produção.
+- O webhook aceita eventos de pagamento ainda pendente e aguarda a confirmação assíncrona de sucesso.
 - **Modo de demonstração:** sem Stripe, o sistema cria pedidos com status `simulado`, sem cobrança real.
 
 ## Deploy (grátis, 1 clique)

@@ -20,10 +20,13 @@ router.post('/', authRequired, async (req, res) => {
   const wanted = new Map();
   for (const it of items) {
     const id = String((it && it.productId) || '');
-    const qty = Math.floor(Number(it && it.quantity));
+    const qty = it && it.quantity;
+    if (!Number.isSafeInteger(qty)) return res.status(400).json({ error: 'Há um item inválido no carrinho.' });
     if (!id || !Number.isFinite(qty) || qty < 1 || qty > 99)
       return res.status(400).json({ error: 'Há um item inválido no carrinho.' });
-    wanted.set(id, (wanted.get(id) || 0) + qty);
+    const combinedQty = (wanted.get(id) || 0) + qty;
+    if (combinedQty > 99) return res.status(400).json({ error: 'Quantidade máxima de 99 unidades por produto.' });
+    wanted.set(id, combinedQty);
   }
 
   // Busca os produtos reais no banco.

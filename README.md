@@ -64,13 +64,18 @@ O checkout com **Stripe Checkout** já está implementado em [`src/routes/checko
 
 1. Crie uma conta no [Stripe](https://stripe.com) e pegue a **chave secreta de teste** (`sk_test_...`).
 2. Defina a variável de ambiente `STRIPE_SECRET_KEY=sk_test_...` (no `.env` local ou nas variáveis do Render).
-3. Pronto. Com a chave presente, a loja passa a redirecionar para o Checkout do Stripe e o pedido só é criado após o pagamento confirmado.
+3. Configure também `PUBLIC_URL` com a origem HTTPS pública da aplicação (por exemplo, `https://sua-loja.example`).
+4. No painel Stripe (em **modo de teste**), crie um endpoint de webhook em `https://seu-dominio/api/stripe/webhook` e assine os eventos `checkout.session.completed` e `checkout.session.async_payment_succeeded`.
+5. Configure `STRIPE_WEBHOOK_SECRET=whsec_...` nas variáveis de ambiente e reinicie o serviço.
+6. Faça pagamentos de teste e confira os pedidos e as tentativas do webhook no painel Stripe. Não utilize chaves de produção antes dessa validação.
 
 Segurança dessa etapa:
 - Os valores das `line_items` vêm do **banco**, não do carrinho do cliente.
 - O pedido é criado apenas quando o Stripe confirma `payment_status = paid`, com **idempotência** pelo id da sessão (`paymentId`).
 - Cartões de teste do Stripe: `4242 4242 4242 4242`, validade futura, CVC qualquer.
-- Em produção, confirme também por **webhook** (`checkout.session.completed`) além do retorno.
+- O webhook valida a assinatura com `STRIPE_WEBHOOK_SECRET` e registra o pedido mesmo sem retorno do navegador. O retorno também confirma a sessão pela API do Stripe. Ambos utilizam a mesma rotina de registro, protegida pelo índice único `paymentId`.
+- **Limitação atual:** o registro compara o valor pago com os preços atuais do banco. Se os preços mudarem entre a criação da sessão e a confirmação, o registro falhará e exigirá conciliação manual. Não use em produção sem implementar um snapshot persistente do pedido.
+- **Modo de demonstração:** sem Stripe, o sistema cria pedidos com status `simulado`, sem cobrança real.
 
 ## Deploy (grátis, 1 clique)
 

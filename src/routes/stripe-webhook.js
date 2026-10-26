@@ -17,6 +17,9 @@ router.post('/', express.raw({ type: 'application/json' }), async (req, res) => 
   if (event.type !== 'checkout.session.completed' && event.type !== 'checkout.session.async_payment_succeeded') {
     return res.json({ received: true });
   }
+  // Pagamentos assíncronos podem estar pendentes no evento completed.
+  // Aguarda async_payment_succeeded em vez de responder 500 indefinidamente.
+  if (event.data.object.payment_status !== 'paid') return res.json({ received: true });
   try {
     await recordPaidCheckout(event.data.object, stripe);
     return res.json({ received: true });

@@ -14,8 +14,16 @@ function stripeClient() {
 }
 
 function baseUrl(req) {
-  // A URL de retorno deve ser configurada pelo operador, não derivada de Host.
-  return process.env.PUBLIC_URL || `${req.protocol}://${req.get('host')}`;
+  // Em produção, não confie no cabeçalho Host para gerar URLs do Stripe.
+  if (process.env.PUBLIC_URL) {
+    const url = new URL(process.env.PUBLIC_URL);
+    if (url.protocol !== 'https:' && !(process.env.NODE_ENV !== 'production' && url.hostname === 'localhost')) {
+      throw new Error('PUBLIC_URL deve usar HTTPS.');
+    }
+    return url.origin;
+  }
+  if (process.env.NODE_ENV === 'production') throw new Error('Configure PUBLIC_URL para ativar pagamentos.');
+  return `${req.protocol}://${req.get('host')}`;
 }
 
 // Valida os itens e calcula o total com o preço do BANCO (nunca do cliente).
@@ -41,6 +49,10 @@ router.post('/', authRequired, async (req, res) => {
   const cart = await priceCart(req.body && req.body.items);
   if (!cart) return res.status(400).json({ error: 'Carrinho inválido.' });
 
+  let origin;
+  try { origin = baseUrl(req); }
+  catch { return res.status(503).json({ error: 'URL pública de pagamento não configurada corretamente.' }); }
+
   const session = await stripe.checkout.sessions.create({
     mode: 'payment',
     line_items: cart.lines.map(({ product, qty }) => ({
@@ -55,8 +67,8 @@ router.post('/', authRequired, async (req, res) => {
       userId: req.userId,
       items: JSON.stringify(cart.lines.map(({ product, qty }) => ({ id: product.id, qty }))),
     },
-    success_url: `${baseUrl(req)}/api/checkout/confirm?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${baseUrl(req)}/?pagamento=cancelado`,
+    success_url: `${origin}/api/checkout/confirm?session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${origin}/?pagamento=cancelado`,
   });
 
   res.json({ url: session.url });

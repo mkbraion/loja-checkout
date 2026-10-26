@@ -12,8 +12,8 @@ function stripeClient() {
 }
 
 function baseUrl(req) {
-  const proto = req.headers['x-forwarded-proto'] || req.protocol;
-  return process.env.PUBLIC_URL || `${proto}://${req.get('host')}`;
+  // A URL de retorno deve ser configurada pelo operador, não derivada de Host.
+  return process.env.PUBLIC_URL || `${req.protocol}://${req.get('host')}`;
 }
 
 // Valida os itens e calcula o total com o preço do BANCO (nunca do cliente).
@@ -21,9 +21,12 @@ async function priceCart(items) {
   const wanted = new Map();
   for (const it of items || []) {
     const id = String((it && it.productId) || '');
-    const qty = Math.floor(Number(it && it.quantity));
+    const qty = it && it.quantity;
+    if (!Number.isSafeInteger(qty)) return null;
     if (!id || !Number.isFinite(qty) || qty < 1 || qty > 99) return null;
-    wanted.set(id, (wanted.get(id) || 0) + qty);
+    const combinedQty = (wanted.get(id) || 0) + qty;
+    if (combinedQty > 99) return null;
+    wanted.set(id, combinedQty);
   }
   if (wanted.size === 0) return null;
   const products = await prisma.product.findMany({ where: { id: { in: [...wanted.keys()] } } });

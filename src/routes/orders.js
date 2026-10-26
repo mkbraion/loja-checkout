@@ -41,7 +41,7 @@ router.post('/', authRequired, async (req, res) => {
     data: {
       userId: req.userId,
       total,
-      status: 'pago',
+      status: 'simulado',
       items: { create: orderItems },
     },
     include: { items: true },

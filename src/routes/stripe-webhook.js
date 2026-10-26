@@ -18,7 +18,7 @@ router.post('/', express.raw({ type: 'application/json' }), async (req, res) => 
     return res.json({ received: true });
   }
   try {
-    await recordPaidCheckout(event.data.object);
+    await recordPaidCheckout(event.data.object, stripe);
     return res.json({ received: true });
   } catch (err) {
     console.error('[stripe webhook] Falha ao registrar pedido:', err.message);

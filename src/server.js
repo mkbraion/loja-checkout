@@ -9,6 +9,7 @@ const authRoutes = require('./routes/auth');
 const productRoutes = require('./routes/products');
 const orderRoutes = require('./routes/orders');
 const checkoutRoutes = require('./routes/checkout');
+const stripeWebhookRoutes = require('./routes/stripe-webhook');
 
 // Sem segredo do JWT o app não sobe — evita rodar inseguro por engano.
 if (!process.env.JWT_SECRET || process.env.JWT_SECRET.length < 16) {
@@ -26,6 +27,8 @@ app.set('trust proxy', 1);
 // arquivos .css e .js externos, sem nada inline.
 app.use(helmet());
 app.use(cors({ origin: process.env.CORS_ORIGIN || '*' }));
+// O Stripe exige bytes originais para validar a assinatura do webhook.
+app.use('/api/stripe/webhook', stripeWebhookRoutes);
 app.use(express.json({ limit: '100kb' }));
 
 // Limite de tentativas nas rotas de conta (anti força-bruta).

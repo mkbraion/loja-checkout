@@ -32,7 +32,7 @@ model Order {
   userId    String
   user      User        @relation(fields: [userId], references: [id])
   total     Int
-  status    String      @default("pago")
+  status    String      @default("simulado")
   paymentId String?     @unique // id da sessão do Stripe (evita pedido duplicado)
   createdAt DateTime    @default(now())
   items     OrderItem[]

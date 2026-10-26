@@ -13,6 +13,10 @@ async function processPayment(amountCents) {
 
 // POST /api/orders — finaliza a compra (protegida)
 router.post('/', authRequired, async (req, res) => {
+  // Impede que um cliente contorne o Stripe criando um pedido de demonstração.
+  if (process.env.STRIPE_SECRET_KEY) {
+    return res.status(403).json({ error: 'Use o checkout de pagamento para finalizar o pedido.' });
+  }
   const { items } = req.body || {};
   if (!Array.isArray(items) || items.length === 0)
     return res.status(400).json({ error: 'Seu carrinho está vazio.' });

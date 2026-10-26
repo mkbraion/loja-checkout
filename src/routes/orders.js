@@ -1,6 +1,7 @@
 const express = require('express');
 const prisma = require('../prisma');
 const { authRequired } = require('../middleware/auth');
+const { normalizeCart } = require('../cart');
 
 const router = express.Router();
 
@@ -16,18 +17,8 @@ router.post('/', authRequired, async (req, res) => {
   if (!Array.isArray(items) || items.length === 0)
     return res.status(400).json({ error: 'Seu carrinho está vazio.' });
 
-  // Normaliza e valida as quantidades vindas do cliente.
-  const wanted = new Map();
-  for (const it of items) {
-    const id = String((it && it.productId) || '');
-    const qty = it && it.quantity;
-    if (!Number.isSafeInteger(qty)) return res.status(400).json({ error: 'Há um item inválido no carrinho.' });
-    if (!id || !Number.isFinite(qty) || qty < 1 || qty > 99)
-      return res.status(400).json({ error: 'Há um item inválido no carrinho.' });
-    const combinedQty = (wanted.get(id) || 0) + qty;
-    if (combinedQty > 99) return res.status(400).json({ error: 'Quantidade máxima de 99 unidades por produto.' });
-    wanted.set(id, combinedQty);
-  }
+  const wanted = normalizeCart(items);
+  if (!wanted) return res.status(400).json({ error: 'Há um item inválido no carrinho.' });
 
   // Busca os produtos reais no banco.
   const products = await prisma.product.findMany({ where: { id: { in: [...wanted.keys()] } } });

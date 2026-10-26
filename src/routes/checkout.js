@@ -1,6 +1,7 @@
 const express = require('express');
 const prisma = require('../prisma');
 const { authRequired } = require('../middleware/auth');
+const { normalizeCart } = require('../cart');
 
 const router = express.Router();
 
@@ -18,17 +19,8 @@ function baseUrl(req) {
 
 // Valida os itens e calcula o total com o preço do BANCO (nunca do cliente).
 async function priceCart(items) {
-  const wanted = new Map();
-  for (const it of items || []) {
-    const id = String((it && it.productId) || '');
-    const qty = it && it.quantity;
-    if (!Number.isSafeInteger(qty)) return null;
-    if (!id || !Number.isFinite(qty) || qty < 1 || qty > 99) return null;
-    const combinedQty = (wanted.get(id) || 0) + qty;
-    if (combinedQty > 99) return null;
-    wanted.set(id, combinedQty);
-  }
-  if (wanted.size === 0) return null;
+  const wanted = normalizeCart(items);
+  if (!wanted) return null;
   const products = await prisma.product.findMany({ where: { id: { in: [...wanted.keys()] } } });
   if (products.length !== wanted.size) return null;
   let total = 0;

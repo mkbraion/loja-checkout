@@ -71,7 +71,7 @@ router.get('/confirm', async (req, res) => {
     const session = await stripe.checkout.sessions.retrieve(String(req.query.session_id || ''));
     if (!session || session.payment_status !== 'paid') return res.redirect('/?pagamento=falhou');
 
-    await recordPaidCheckout(session);
+    await recordPaidCheckout(session, stripe);
     res.redirect('/?pagamento=ok');
   } catch (e) {
     res.redirect('/?pagamento=erro');

@@ -1,19 +1,3 @@
-<!-- MKBRAION-POLISH:START -->
-<div align="center">
-
-# Loja Checkout
-
-**E-commerce full-stack com checkout seguro, autenticação JWT, proteção contra adulteração de preços, rate limiting e API Node.js.**
-
-[![Repositório](https://img.shields.io/badge/GitHub-Repositório-181717?logo=github)](https://github.com/mkbraion/loja-checkout)
-
-</div>
-
-**Stack / tópicos:** ``backend`` · ``bcrypt`` · ``checkout`` · ``css`` · ``ecommerce`` · ``express`` · ``frontend`` · ``fullstack`` · ``html`` · ``javascript`` · ``jwt`` · ``nodejs``
-
-> Projeto mantido por [@mkbraion](https://github.com/mkbraion).
-<!-- MKBRAION-POLISH:END -->
-
 # Loja Virtual · login seguro e checkout
 
 **No ar:** https://loja-checkout.onrender.com
